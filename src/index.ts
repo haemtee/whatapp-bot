@@ -63,7 +63,7 @@ async function connectToWhatsApp() {
     conn.ev.on("messages.upsert", async ({ messages }) => {
         const m = messages[0];
         const id = m.key.remoteJid
-        // console.log(m);
+        console.log(m);
         // console.log("===qu===");
 
         if (!m.message) return; // if there is no text or media message
