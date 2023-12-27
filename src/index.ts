@@ -145,13 +145,13 @@ async function connectToWhatsApp() {
                     return conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m });
                 }
                 console.log(result);
-                
+
                 if (!result) { return await conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m }); }
                 return await conn.sendMessage(id!, { text: result }, { quoted: m });
             }
         }
-        if (messageType === "extendedTextMessage") {
-            let text = m.message.extendedTextMessage?.text; // get the text of the message
+        if (messageType === "extendedTextMessage" || messageType === "conversation") {
+            let text = m.message.extendedTextMessage?.text ? m.message.extendedTextMessage?.text : m.message.conversation
             if (!text) return; // if there is no text
             const keyword = text.substring(0, 4);
             if (keyword !== KATA_KUNCI) return
