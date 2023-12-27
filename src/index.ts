@@ -9,6 +9,9 @@ import makeWASocket, {
 import MAIN_LOGGER from "@whiskeysockets/baileys/lib/Utils/logger";
 import { Boom } from "@hapi/boom";
 import { geminiAI } from "./gemini";
+import { findMessageId, saveMessageId } from "./redis";
+// @ts-ignore
+import { conversationGemini } from "./conv";
 
 require('dotenv').config();
 
@@ -80,10 +83,18 @@ async function connectToWhatsApp() {
             // console.log(quotedMessageType);
             let text = m.message.extendedTextMessage?.text
             if (!text) return
-            const keyword = text.substring(0, 4)
-            if (keyword !== KATA_KUNCI) return
-            text = text.substring(4)
+            console.log(m.message.extendedTextMessage.contextInfo.stanzaId);
 
+            const msgid = m.message.extendedTextMessage.contextInfo.stanzaId
+            let isConv
+            if (msgid) isConv = await findMessageId(msgid)
+            if (!isConv) {
+                const keyword = text.substring(0, 4)
+                if (keyword !== KATA_KUNCI) return
+                else {
+                    text = text.substring(4)
+                }
+            }
             // console.log(quotedMessageType);
             if (quotedMessageType === "extendedTextMessage" || quotedMessageType === "conversation") {
                 let quotedText = quotedMessageType === "extendedTextMessage" ? quotedMessage.extendedTextMessage?.text : quotedMessage.conversation
@@ -93,7 +104,7 @@ async function connectToWhatsApp() {
 
                 await conn.sendPresenceUpdate('composing', id!)
                 try {
-                    result = await geminiAI(false, text)
+                    result = await conversationGemini(false, text)
                     // console.log(result);
 
                 } catch (error) {
@@ -101,7 +112,8 @@ async function connectToWhatsApp() {
                     return conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m });
                 }
                 if (!result) { return await conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m }); }
-                return conn.sendMessage(id!, { text: result }, { quoted: m });
+                const reply = await conn.sendMessage(id!, { text: result }, { quoted: m });
+                return await saveMessageId(reply?.key.id!)
             }
             if (quotedMessageType === "imageMessage") {
                 // download the message
@@ -147,7 +159,8 @@ async function connectToWhatsApp() {
                 console.log(result);
 
                 if (!result) { return await conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m }); }
-                return await conn.sendMessage(id!, { text: result }, { quoted: m });
+                const reply = await conn.sendMessage(id!, { text: result }, { quoted: m });
+                return await saveMessageId(reply?.key.id!)
             }
         }
         if (messageType === "extendedTextMessage" || messageType === "conversation") {
@@ -161,7 +174,7 @@ async function connectToWhatsApp() {
 
             await conn.sendPresenceUpdate('composing', id!)
             try {
-                result = await geminiAI(false, text)
+                result = await conversationGemini(id, text)
                 // console.log(result);
 
             } catch (error) {
@@ -169,7 +182,8 @@ async function connectToWhatsApp() {
                 return conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m });
             }
             if (!result) { return await conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m }); }
-            return await conn.sendMessage(id!, { text: result }, { quoted: m });
+            const reply = await conn.sendMessage(id!, { text: result }, { quoted: m });
+            return await saveMessageId(reply?.key.id!)
         }
 
         // if the message is an image
@@ -214,8 +228,8 @@ async function connectToWhatsApp() {
                 return conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m });
             }
             if (!result) { return await conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m }); }
-            return await conn.sendMessage(id!, { text: result }, { quoted: m });
-
+            const reply = await conn.sendMessage(id!, { text: result }, { quoted: m });
+            return await saveMessageId(reply?.key.id!)
         }
     });
 }
