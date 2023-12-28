@@ -9,7 +9,7 @@ import makeWASocket, {
 import MAIN_LOGGER from "@whiskeysockets/baileys/lib/Utils/logger";
 import { Boom } from "@hapi/boom";
 import { geminiAI } from "./gemini";
-import { findMessageId, saveMessageId } from "./redis";
+import { findMessageId, removeKey, saveMessageId } from "./redis";
 // @ts-ignore
 import { conversationGemini } from "./conv";
 
@@ -171,7 +171,7 @@ async function connectToWhatsApp() {
 
             text = text.substring(4) + "?"
             let result: string
-
+            await removeKey(id!)
             await conn.sendPresenceUpdate('composing', id!)
             try {
                 result = await conversationGemini(id, text)
@@ -192,7 +192,7 @@ async function connectToWhatsApp() {
             if (!text) return; // if there is no text
             const keyword = text.substring(0, 4);
             if (keyword !== KATA_KUNCI) return
-
+            
             const filePath: string = './temp_image/whatapp-image' + new Date().getTime() + '.jpeg';
             let buffer: Buffer | any
             try {

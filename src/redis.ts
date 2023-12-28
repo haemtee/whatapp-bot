@@ -61,6 +61,10 @@ export async function getMem(id: string) {
     }
 }
 
+export async function removeKey(id: string) {
+    await clientRedis.del(id)
+}
+
 export async function addMem(id: string, history: any) {
     await clientRedis.json.arrAppend(id, '.history',
         history
