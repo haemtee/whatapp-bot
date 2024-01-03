@@ -12,7 +12,7 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 export const MODEL_VISION = {
     model: genAI.getGenerativeModel({ model: process.env.MODEL_VISION! }),
     config: {
-        temperature: 0.2,
+        temperature: 0.4,
         topK: 32,
         topP: 1,
         maxOutputTokens: 4096
@@ -22,7 +22,7 @@ export const MODEL_VISION = {
 export const MODEL_TEXT = {
     model: genAI.getGenerativeModel({ model: process.env.MODEL_TEXT! }),
     config: {
-        temperature: 0.3,
+        temperature: 0.7,
         topK: 1,
         topP: 1,
         maxOutputTokens: 2048
