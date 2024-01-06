@@ -83,7 +83,6 @@ async function connectToWhatsApp() {
             // console.log(quotedMessageType);
             let text = m.message.extendedTextMessage?.text
             if (!text) return
-            console.log(m.message.extendedTextMessage.contextInfo.stanzaId);
 
             const msgid = m.message.extendedTextMessage.contextInfo.stanzaId
             let isConv
@@ -98,13 +97,13 @@ async function connectToWhatsApp() {
             // console.log(quotedMessageType);
             if (quotedMessageType === "extendedTextMessage" || quotedMessageType === "conversation") {
                 let quotedText = quotedMessageType === "extendedTextMessage" ? quotedMessage.extendedTextMessage?.text : quotedMessage.conversation
-                quotedText += "\n\n" + text + "?"
+                quotedText += "\n" + text + "?"
                 let result: string
                 // console.log(quotedText);
 
                 await conn.sendPresenceUpdate('composing', id!)
                 try {
-                    result = await conversationGemini(false, text)
+                    result = await conversationGemini(false, quotedText)
                     // console.log(result);
 
                 } catch (error) {
