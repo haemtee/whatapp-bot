@@ -12,6 +12,7 @@ import { geminiAI } from "./gemini";
 import { findMessageId, removeKey, saveMessageId } from "./redis";
 // @ts-ignore
 import { conversationGemini } from "./conv";
+import { tldrArticle } from "./article";
 
 require('dotenv').config();
 
@@ -80,9 +81,35 @@ async function connectToWhatsApp() {
 
             const quotedMessage = m.message.extendedTextMessage.contextInfo.quotedMessage
             const quotedMessageType = Object.keys(quotedMessage)[0]
-            // console.log(quotedMessageType);
+            let quotedText = quotedMessageType === "extendedTextMessage" ? quotedMessage.extendedTextMessage?.text : quotedMessage.conversation
+
             let text = m.message.extendedTextMessage?.text
             if (!text) return
+
+            if (quotedText) {
+                const urlRegex = /https?:\/\/[^\s]+/g
+                console.log(quotedText);
+                if (urlRegex.test(quotedText)) {
+                    const url = quotedText.match(urlRegex)![0];
+
+                    await conn.sendPresenceUpdate('composing', id!)
+                    let result
+                    try {
+                        if (text === "tldr") {
+                            result = await tldrArticle(url);
+                        } else {
+                            result = await tldrArticle(url, text)
+                        }
+                    } catch (error) {
+                        console.log(error)
+                        return conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m });
+                    }
+                    if (!result) { return await conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m }); }
+                    const balasan = `Judul : *${result.title}*\n\nURL : *${result.url}*\n\n *Males Baca :* \n${result.tldr}`
+                    const reply = await conn.sendMessage(id!, { text: balasan }, { quoted: m });
+                    return await saveMessageId(reply?.key.id!)
+                }
+            }
 
             const msgid = m.message.extendedTextMessage.contextInfo.stanzaId
             let isConv
@@ -96,7 +123,7 @@ async function connectToWhatsApp() {
             }
             // console.log(quotedMessageType);
             if (quotedMessageType === "extendedTextMessage" || quotedMessageType === "conversation") {
-                let quotedText = quotedMessageType === "extendedTextMessage" ? quotedMessage.extendedTextMessage?.text : quotedMessage.conversation
+
                 quotedText += "\n" + text + "?"
                 let result: string
                 // console.log(quotedText);
@@ -191,7 +218,7 @@ async function connectToWhatsApp() {
             if (!text) return; // if there is no text
             const keyword = text.substring(0, 4);
             if (keyword !== KATA_KUNCI) return
-            
+
             const filePath: string = './temp_image/whatapp-image' + new Date().getTime() + '.jpeg';
             let buffer: Buffer | any
             try {
