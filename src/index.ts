@@ -99,7 +99,11 @@ async function connectToWhatsApp() {
                         if (text === "tldr") {
                             result = await tldrArticle(url);
                         } else {
-                            result = await tldrArticle(url, text)
+                            const keyword = text.substring(0, 4);
+                            if (keyword === KATA_KUNCI) {
+                                text = text.substring(4) + "?"
+                                result = await tldrArticle(url, text)
+                            }
                         }
                     } catch (error) {
                         console.log(error)
@@ -119,10 +123,7 @@ async function connectToWhatsApp() {
                 const keyword = text.substring(0, 4)
                 if (keyword !== KATA_KUNCI) return
                 else {
-                    const keyword = text.substring(0, 4);
-                    if (keyword === KATA_KUNCI) {
-                        text = text.substring(4) + "?"
-                    }
+                    text = text.substring(4) + "?"
                 }
             }
             // console.log(quotedMessageType);
