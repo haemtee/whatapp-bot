@@ -12,6 +12,7 @@ import { geminiAI } from "./gemini";
 import { findMessageId, removeKey, saveMessageId } from "./redis";
 // @ts-ignore
 import { conversationGemini } from "./conv";
+// @ts-ignore
 import { tldrArticle } from "./article";
 
 require('dotenv').config();
