@@ -103,6 +103,8 @@ async function connectToWhatsApp() {
                             if (keyword === KATA_KUNCI) {
                                 text = text.substring(4) + "?"
                                 result = await tldrArticle(url, text)
+                            } else {
+                                return
                             }
                         }
                     } catch (error) {
