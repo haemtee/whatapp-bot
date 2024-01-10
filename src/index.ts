@@ -119,7 +119,10 @@ async function connectToWhatsApp() {
                 const keyword = text.substring(0, 4)
                 if (keyword !== KATA_KUNCI) return
                 else {
-                    text = text.substring(4)
+                    const keyword = text.substring(0, 4);
+                    if (keyword === KATA_KUNCI) {
+                        text = text.substring(4) + "?"
+                    }
                 }
             }
             // console.log(quotedMessageType);
