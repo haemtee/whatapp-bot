@@ -113,7 +113,7 @@ async function connectToWhatsApp() {
                         return conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m });
                     }
                     if (!result) { return await conn.sendMessage(id!, { text: "Something wrong" }, { quoted: m }); }
-                    const balasan = `Judul : *${result.title}*\n\nURL : *${result.url}*\n\n *Males Baca :* \n${result.tldr}`
+                    const balasan = `Judul : *${result.title}*\n\n *Males Baca :* \n${result.tldr}`
                     const reply = await conn.sendMessage(id!, { text: balasan }, { quoted: m });
                     return await saveMessageId(reply?.key.id!)
                 }
