@@ -93,14 +93,15 @@ async function connectToWhatsApp() {
                 if (urlRegex.test(quotedText)) {
                     const url = quotedText.match(urlRegex)![0];
 
-                    await conn.sendPresenceUpdate('composing', id!)
                     let result
                     try {
                         if (text === "tldr") {
+                            await conn.sendPresenceUpdate('composing', id!)
                             result = await tldrArticle(url);
                         } else {
                             const keyword = text.substring(0, 4);
                             if (keyword === KATA_KUNCI) {
+                                await conn.sendPresenceUpdate('composing', id!)
                                 text = text.substring(4) + "?"
                                 result = await tldrArticle(url, text)
                             } else {
