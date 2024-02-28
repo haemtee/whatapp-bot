@@ -16,8 +16,8 @@ if (isDev === "TRUE") {
     clientRedis = createClient({
         password: process.env.REDIS_CLOUD,
         socket: {
-            host: 'redis-15480.c54.ap-northeast-1-2.ec2.cloud.redislabs.com',
-            port: 15480
+            host: 'redis-16035.c54.ap-northeast-1-2.ec2.cloud.redislabs.com',
+            port: 16035
         }
     });
 }

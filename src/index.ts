@@ -78,9 +78,12 @@ async function connectToWhatsApp() {
 
         if (m.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
             if (messageType !== "extendedTextMessage") return;
-            // console.log( m.message.extendedTextMessage.contextInfo);
+            const quotedFrom = m.message.extendedTextMessage.contextInfo.participant
+            // console.log('TEST ' + m.message.extendedTextMessage.contextInfo.participant);
 
             const quotedMessage = m.message.extendedTextMessage.contextInfo.quotedMessage
+            
+            
             const quotedMessageType = Object.keys(quotedMessage)[0]
             let quotedText = quotedMessageType === "extendedTextMessage" ? quotedMessage.extendedTextMessage?.text : quotedMessage.conversation
 
@@ -132,7 +135,8 @@ async function connectToWhatsApp() {
             // console.log(quotedMessageType);
             if (quotedMessageType === "extendedTextMessage" || quotedMessageType === "conversation") {
 
-                quotedText = `berdasarkan pernyataan ${quotedMessage}, pertanyaanku adalah : ${text} `
+                quotedText = quotedFrom === "62895392348021@s.whatsapp.net"  ? `${quotedText},\n\n ${text}` : //quote dari AI
+                    `${quotedMessage} \n pertanyaannya: ${text}` //quote dari user
                 let result: string
                 // console.log(quotedText);
 

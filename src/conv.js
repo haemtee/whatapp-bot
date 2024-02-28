@@ -17,11 +17,12 @@ async function conversationGemini(id, text) {
     } else {
         history = []
     }
+    if (history.length > 10) history.slice(-10)
     let model = MODEL_TEXT.model;
     const chat = model.startChat({
         generationConfig: MODEL_TEXT.config,
         safetySettings,
-        history: mem
+        history: history
     });
     await saveMem(id.toString(), "user", text)
     const result = await chat.sendMessage(text);
