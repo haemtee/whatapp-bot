@@ -132,7 +132,7 @@ async function connectToWhatsApp() {
             // console.log(quotedMessageType);
             if (quotedMessageType === "extendedTextMessage" || quotedMessageType === "conversation") {
 
-                quotedText += "\n" + text + "?"
+                quotedText = `berdasarkan pernyataan ${quotedMessage}, pertanyaanku adalah : ${text} `
                 let result: string
                 // console.log(quotedText);
 
